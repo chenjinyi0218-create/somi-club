@@ -1,0 +1,53 @@
+@font-face{font-family:SomiHandwritten;src:url('assets/fonts/NanumPenScript-Regular.ttf') format('truetype');font-style:normal;font-weight:400;font-display:swap}
+body::before{background:url('assets/animation-stars.png') center / cover no-repeat;filter:brightness(.16);opacity:1}
+.spread.cover .cover-backdrop{display:none}
+body:has(#picture .emoji-intro){--emoji-background:url('assets/emoji/background-lulu.png');background:#e4f4fc;color:#292d32}
+body:has(#picture .emoji-panel[data-group="1"].is-active){--emoji-background:url('assets/emoji/background-heebong.png')}
+body:has(#picture .emoji-panel[data-group="2"].is-active){--emoji-background:url('assets/emoji/background-chungman.png')}
+body:has(#picture .emoji-finale.is-active){--emoji-background:url('assets/emoji/background-lulu.png')}
+body:has(#picture .emoji-intro)::before{background:var(--emoji-background) center / cover no-repeat;filter:none;opacity:1}
+body:has(#picture .emoji-intro) #stage{inset:0}
+body:has(#picture .emoji-intro) .footer-brand span{color:#292d32}
+body:has(#picture .emoji-intro) .controls{background:#ffffffeb;border-color:#dce1e7;border-radius:8px;box-shadow:none;color:#292d32}
+body:has(#picture .emoji-intro) button:hover{color:#2781a8}
+body:has(#picture .emoji-intro) button:focus-visible,body:has(#picture .emoji-intro) select:focus-visible{outline-color:#2781a8}
+body:has(#picture .emoji-intro) select option{background:#fff;color:#292d32}
+body:has(#picture .emoji-intro) .progress{background:#dce1e7}
+body:has(#picture .emoji-intro) .progress span{background:#5baac9}
+.emoji-intro{position:relative;width:100%;height:100%;background:transparent;overflow:hidden}
+.emoji-panel{position:absolute;inset:20px 24px 70px;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr) minmax(0,1fr);gap:24px;align-items:center;opacity:0;visibility:hidden;transition:opacity .35s}
+.emoji-panel.is-active{opacity:1;visibility:visible}
+.emoji-cloud{height:100%;max-height:640px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));grid-template-rows:repeat(5,minmax(0,1fr));align-items:center;justify-items:center;gap:12px}
+.emoji-center{height:100%;min-width:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:22px;opacity:0;visibility:hidden;transition:opacity .6s}
+.emoji-center.is-visible,.emoji-finale.is-active .emoji-center{opacity:1;visibility:visible}
+.emoji-name{display:block;flex:none;color:#292d32;font-family:SomiHandwritten,'Apple SD Gothic Neo',sans-serif;font-size:40px;font-weight:400;line-height:1.3;letter-spacing:0;text-align:center}
+:is(#stage,.scene-transition) .emoji-intro .emoji-sticker{position:static!important;width:100%;height:100%;max-width:146px;max-height:116px;object-fit:contain;opacity:0;transform:translateY(12px) scale(.8);transition:opacity .35s,transform .45s}
+:is(#stage,.scene-transition) .emoji-intro .emoji-sticker.is-visible{opacity:1;transform:none}
+:is(#stage,.scene-transition) .emoji-intro .emoji-figure{position:static!important;width:100%;height:100%;max-height:480px;object-fit:contain;opacity:0;transform:translateY(18px) scale(.95);transition:opacity .6s,transform .6s}
+:is(#stage,.scene-transition) .emoji-intro .emoji-center .emoji-figure{height:65%;flex:none}
+:is(#stage,.scene-transition) .emoji-intro .emoji-figure.is-visible{opacity:1;transform:none}
+.emoji-finale{position:absolute;inset:12%;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6%;align-items:center;opacity:0;visibility:hidden;transition:opacity .6s}
+.emoji-finale.is-active{opacity:1;visibility:visible}
+.emoji-finale.emoji-walk-finale{inset:0;display:block}
+:is(#stage,.scene-transition) .emoji-intro .emoji-walk-video{width:100%;height:100%;object-fit:contain;display:block}
+:is(#stage,.scene-transition) .emoji-intro .emoji-finale img{position:static!important;width:100%;height:100%;max-height:430px;object-fit:contain}
+@media(max-width:600px){.emoji-panel{inset:22px 5px 114px;gap:8px;grid-template-columns:minmax(0,1fr) minmax(0,1.1fr) minmax(0,1fr)}.emoji-cloud{gap:10px 5px;max-height:540px}:is(#stage,.scene-transition) .emoji-intro .emoji-sticker{max-width:60px;max-height:80px}:is(#stage,.scene-transition) .emoji-intro .emoji-figure{max-height:250px}.emoji-finale{inset:22% 6%;gap:4%}.emoji-name{font-size:28px}.emoji-center{gap:16px}}
+@media(prefers-reduced-motion:reduce){.emoji-panel,.emoji-finale,:is(#stage,.scene-transition) .emoji-intro .emoji-sticker,:is(#stage,.scene-transition) .emoji-intro .emoji-figure{transition:none;transform:none}}
+
+/* Outlined Nanum Pen names preserve the handwritten lettering on every browser. */
+:is(#stage,.scene-transition) .emoji-intro .emoji-name-art{position:static!important;display:block;width:auto!important;height:40px!important;max-width:100%;object-fit:contain}
+@media(max-width:600px){:is(#stage,.scene-transition) .emoji-intro .emoji-name-art{height:28px!important}}
+
+.emoji-name{display:flex;align-items:center;justify-content:center;height:52px}
+@media(max-width:600px){.emoji-name{height:36.4px}}
+
+/* Crossfade each role's background and keep the old panel visible until it fades. */
+body:has(#picture .emoji-intro)::before{background:none}
+.emoji-backgrounds,.emoji-background{position:absolute;inset:0;pointer-events:none}
+.emoji-background{background-position:center;background-size:cover;opacity:0;transition:opacity .75s ease-in-out}
+.emoji-background.is-active{opacity:1}
+.emoji-panel{transition:opacity .65s ease-in-out,visibility 0s linear .65s}
+.emoji-panel.is-active{transition:opacity .65s ease-in-out,visibility 0s}
+.emoji-finale{transition:opacity .75s ease-in-out,visibility 0s linear .75s}
+.emoji-finale.is-active{transition:opacity .75s ease-in-out,visibility 0s}
+@media(prefers-reduced-motion:reduce){.emoji-background,.emoji-panel,.emoji-finale{transition:none}}
