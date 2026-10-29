@@ -407,7 +407,7 @@ document.querySelector('#prev').onclick=()=>show(index-1);
 document.querySelector('#next').onclick=()=>show(index+1);
 document.querySelector('#speed').onchange=e=>rate=Number(e.target.value);
 function syncPageMusic(page){
- const source=page.intro?'assets/animation-music.wav':'assets/story-music-v3.mp3';
+ const source=page.intro?'assets/animation-music.wav':'story-music-v3.mp3';
  if(audio.getAttribute('src')===source){audio.volume=.6;return;}
  audio.pause();
  audio.autoplay=audioEnabled;
