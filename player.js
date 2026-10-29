@@ -428,8 +428,40 @@ document.addEventListener('pointerdown',retryAudioOnInteraction,{passive:true});
 document.addEventListener('keydown',retryAudioOnInteraction);
 startAudio();
 const full=document.querySelector('#full');
-if(!document.documentElement.requestFullscreen)full.hidden=true;
-full.onclick=async()=>{try{if(document.fullscreenElement)await document.exitFullscreen();else await document.documentElement.requestFullscreen();}catch{}};
+const root=document.documentElement;
+const fullscreenElement=()=>document.fullscreenElement||document.webkitFullscreenElement;
+const enterFullscreen=root.requestFullscreen||root.webkitRequestFullscreen;
+const leaveFullscreen=document.exitFullscreen||document.webkitExitFullscreen;
+if(!enterFullscreen)full.hidden=true;
+function fullscreenState(){
+ const active=Boolean(fullscreenElement());
+ full.setAttribute('aria-label',active?'전체 화면 종료':'전체 화면');
+ full.setAttribute('aria-pressed',String(active));
+ full.title=active?'전체 화면 종료 · Esc':'전체 화면';
+}
+full.onclick=async()=>{
+ try{
+  if(fullscreenElement()){if(leaveFullscreen)await leaveFullscreen.call(document);}
+  else if(enterFullscreen)await enterFullscreen.call(root);
+ }catch{full.title='브라우저 메뉴에서 전체 화면을 선택해 주세요';}
+};
+document.addEventListener('fullscreenchange',fullscreenState);
+document.addEventListener('webkitfullscreenchange',fullscreenState);
+fullscreenState();
+let hideControlsTimer;
+function revealControls(){
+ document.body.classList.remove('ui-idle');
+ clearTimeout(hideControlsTimer);
+ hideControlsTimer=setTimeout(()=>{
+  if(!document.querySelector('.controls:hover,.controls:focus-within'))document.body.classList.add('ui-idle');
+ },3000);
+}
+document.addEventListener('pointermove',revealControls,{passive:true});
+document.addEventListener('pointerdown',revealControls,{passive:true});
+document.addEventListener('keydown',revealControls);
+document.querySelector('.controls').addEventListener('pointerleave',revealControls);
+document.querySelector('.controls').addEventListener('focusout',revealControls);
+revealControls();
 stage.addEventListener('click',event=>{
  if(!suppressDragClick||event.detail===0)return;
  suppressDragClick=false;
