@@ -175,6 +175,32 @@ function renderPage(page,items,pageNumber){
   const front=document.createElement('span');
   front.className='hardcover-front';
   front.append(art);
+  if(page.motionSrc){
+   if(reducedMotion.matches){art.src=page.stillSrc;}
+   else{
+    const video=document.createElement('video');
+    video.className='cover-motion';
+    video.muted=true;
+    video.defaultMuted=true;
+    video.playsInline=true;
+    video.preload='auto';
+    video.poster=page.srcs[0];
+    video.setAttribute('playsinline','');
+    video.setAttribute('webkit-playsinline','');
+    video.setAttribute('aria-hidden','true');
+    video.disablePictureInPicture=true;
+    const fallback=()=>{
+     video.dataset.failed='true';
+     video.hidden=true;
+     art.src=page.stillSrc;
+    };
+    video.addEventListener('loadeddata',()=>video.classList.add('is-ready'),{once:true});
+    video.addEventListener('error',fallback,{once:true});
+    video.coverFallback=fallback;
+    video.src=page.motionSrc;
+    front.append(video);
+   }
+  }
   if(backCover)addLights(front,page.srcs[0]);
   book.append(paper,spine,front);
   spread.append(book);
@@ -190,6 +216,21 @@ function renderPage(page,items,pageNumber){
   return spread;
  }
  return renderInterior(page,items,pageNumber);
+}
+// Keep the five-second cover in step with the book controls and page turns.
+function syncCoverMotion(){
+ const video=picture.querySelector('video.cover-motion');
+ if(!video||video.dataset.failed)return video;
+ video.playbackRate=rate;
+ const playing=!paused&&!loading&&!turning&&!document.hidden;
+ if(!playing){if(!video.paused)video.pause();return video;}
+ if(video.paused&&!video.ended&&!video.coverPlayPending){
+  video.coverPlayPending=true;
+  video.play().catch(error=>{
+   if(error.name!=='AbortError')video.coverFallback?.();
+  }).finally(()=>{video.coverPlayPending=false;});
+ }
+ return video;
 }
 function resetClock(){
  elapsed=0;
@@ -401,11 +442,11 @@ picture.addEventListener('click',event=>{
  if(!page)return;
  show(page.classList.contains('right')?index+1:index-1);
 });
-function toggle(){paused=!paused;pause.textContent=paused?'▶':'Ⅱ';pause.setAttribute('aria-label',paused?'재생':'일시정지');pause.setAttribute('aria-pressed',String(paused));}
+function toggle(){paused=!paused;pause.textContent=paused?'▶':'Ⅱ';pause.setAttribute('aria-label',paused?'재생':'일시정지');pause.setAttribute('aria-pressed',String(paused));syncCoverMotion();}
 pause.onclick=toggle;
 document.querySelector('#prev').onclick=()=>show(index-1);
 document.querySelector('#next').onclick=()=>show(index+1);
-document.querySelector('#speed').onchange=e=>rate=Number(e.target.value);
+document.querySelector('#speed').onchange=e=>{rate=Number(e.target.value);syncCoverMotion();};
 function syncPageMusic(page){
  const source=page.intro?'assets/animation-music.wav':'story-music-v3.mp3';
  if(audio.getAttribute('src')===source){audio.volume=.6;return;}
@@ -512,14 +553,16 @@ stage.addEventListener('pointerup',e=>{
 });
 stage.addEventListener('pointercancel',()=>{if(drag){drag.released=false;if(drag.ready)releaseTurn(drag);}drag=null;});
 document.addEventListener('keydown',e=>{if(e.target.closest('button,select'))return;if(e.code==='Space'){e.preventDefault();toggle();}if(e.key==='ArrowRight')show(index+1);if(e.key==='ArrowLeft')show(index-1);});
-document.addEventListener('visibilitychange',()=>last=0);
+document.addEventListener('visibilitychange',()=>{last=0;syncCoverMotion();});
 function tick(now){
+ const coverVideo=syncCoverMotion();
  const logo=pages[index].intro&&!pages[index].emojiIntro;
  const ending=pages[index].title==='底面';
  if(last&&!paused&&!loading&&(!turning||logo)&&!document.hidden){
   elapsed+=Math.min(now-last,250)*(logo?1:rate);
   if((logo||ending)&&!audio.paused)audio.volume=.6*Math.max(0,Math.min(1,(pages[index].duration*1000-elapsed)/(ending?3000:2000)));
-  if(elapsed>=pages[index].duration*1000)show(index+1);
+  if(coverVideo&&!coverVideo.dataset.failed&&coverVideo.readyState>=2)elapsed=coverVideo.currentTime*1000;
+  if(elapsed>=pages[index].duration*1000||coverVideo?.ended)show(index+1);
  }
  last=now;
  if(pages[index].emojiIntro)window.updateSomiEmojiIntro(elapsed,{playing:!paused&&!loading&&!turning&&!document.hidden,rate});
@@ -529,3 +572,4 @@ function tick(now){
 show(0);
 requestAnimationFrame(tick);
 })();
+
