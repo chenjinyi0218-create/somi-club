@@ -200,3 +200,6 @@ html:fullscreen,html:-webkit-full-screen{width:100%;height:100%;background:#111c
 
 /* Separate original hand layers rotate over the unchanged illustrated clock. */
 .clock-illustration .story-clock{display:block;width:100%;height:100%;overflow:hidden;pointer-events:none}
+
+/* Both halves share the same travel clock, so the panorama crosses the spread continuously. */
+.road-art .story-road{display:block;width:100%;height:100%;pointer-events:none;overflow:hidden}

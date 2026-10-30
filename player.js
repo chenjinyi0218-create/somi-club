@@ -118,6 +118,11 @@ function imagePage(item,side,page){
 function widePage(item,side){
  const shell=document.createElement('div');
  shell.className='page-art wide-art wide-art-'+side;
+ if(item&&item.ok&&item.src==='assets/page-14.webp'&&window.createSomiRoadArt){
+  shell.classList.add('road-art');
+  shell.append(window.createSomiRoadArt(side));
+  return shell;
+ }
  if(item&&item.ok){
   shell.style.backgroundImage=`url("${item.src}")`;
  }else{
@@ -605,6 +610,7 @@ function tick(now){
   if(elapsed>=pages[index].duration*1000||coverVideo?.ended)show(index+1);
  }
  last=now;
+ if(pages[index].srcs.includes('assets/page-14.webp'))window.updateSomiRoadArt?.(picture,elapsed,reducedMotion.matches);
  updateClockHands(elapsed);
  updateQuestionWarm(elapsed);
  if(pages[index].emojiIntro)window.updateSomiEmojiIntro(elapsed,{playing:!paused&&!loading&&!turning&&!document.hidden,rate});
