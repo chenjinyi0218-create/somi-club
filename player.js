@@ -74,18 +74,23 @@ function imagePage(item,side,page){
  }
  if(item.src==='assets/page-03.webp'){
   const reveal=document.createElement('div');
-  reveal.className='question-reveal';
-  reveal.style.backgroundImage='url("assets/page-02.webp")';
-  ['행복은','어디에 있을까?'].forEach((label,i)=>{
-   const button=document.createElement('button');
-   button.className='question-line line-'+i;
-   button.type='button';
-   button.setAttribute('aria-label',label+' · 다시 보기');
-   const art=document.createElement('span');
-   art.style.backgroundImage='url("assets/page-03.webp")';
-   button.append(art);
-   reveal.append(button);
+  reveal.className='question-reveal question-warm-reveal';
+  const button=document.createElement('button');
+  button.className='question-handwritten';
+  button.type='button';
+  button.setAttribute('aria-label','행복은 어디에 있을까? · 따뜻한 빛 다시 보기');
+  ['question-ink','question-glow'].forEach(className=>{
+   const layer=document.createElement('span');
+   layer.className=className;
+   layer.setAttribute('aria-hidden','true');
+   if(className==='question-glow'){
+    const ink=document.createElement('span');
+    ink.className='question-warm-ink';
+    layer.append(ink);
+   }
+   button.append(layer);
   });
+  reveal.append(button);
   shell.append(reveal);
   return shell;
  }
@@ -231,6 +236,14 @@ function syncCoverMotion(){
   }).finally(()=>{video.coverPlayPending=false;});
  }
  return video;
+}
+function updateQuestionWarm(milliseconds){
+ const scene=picture.querySelector('.question-warm-reveal');
+ if(!scene)return;
+ const fraction=reducedMotion.matches?1:Math.max(0,Math.min(1,(milliseconds-1000)/3500));
+ const amount=fraction*fraction*(3-2*fraction);
+ const opacity=String(Math.round(amount*255)/255);
+ if(scene.style.getPropertyValue('--warm-opacity')!==opacity)scene.style.setProperty('--warm-opacity',opacity);
 }
 function resetClock(){
  elapsed=0;
@@ -428,6 +441,8 @@ picture.addEventListener('click',event=>{
   show(0);return;
  }
  if(event.target.closest('.hardcover')){show(pages[index].title==='底面'?index-1:index+1);return;}
+ const warmQuestion=event.target.closest('.question-handwritten');
+ if(warmQuestion){resetClock();updateQuestionWarm(0);return;}
  const line=event.target.closest('.question-line');
  if(line){
   const region=line.parentElement;
@@ -565,6 +580,7 @@ function tick(now){
   if(elapsed>=pages[index].duration*1000||coverVideo?.ended)show(index+1);
  }
  last=now;
+ updateQuestionWarm(elapsed);
  if(pages[index].emojiIntro)window.updateSomiEmojiIntro(elapsed,{playing:!paused&&!loading&&!turning&&!document.hidden,rate});
  bar.style.transform=`scaleX(${Math.min(1,elapsed/(pages[index].duration*1000))})`;
  requestAnimationFrame(tick);
