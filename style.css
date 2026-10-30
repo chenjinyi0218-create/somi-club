@@ -197,3 +197,6 @@ html:fullscreen,html:-webkit-full-screen{width:100%;height:100%;background:#111c
 .question-handwritten .question-glow{opacity:var(--warm-opacity);filter:drop-shadow(0 0 3px #ffce6066) drop-shadow(0 0 10px #ffc34c4d)}
 .question-handwritten .question-warm-ink{background:#f5c637;mask-image:url('assets/question-happiness-mask-20261030.svg');-webkit-mask-image:url('assets/question-happiness-mask-20261030.svg')}
 #outgoing .question-handwritten{pointer-events:none}
+
+/* Separate original hand layers rotate over the unchanged illustrated clock. */
+.clock-illustration .story-clock{display:block;width:100%;height:100%;overflow:hidden;pointer-events:none}

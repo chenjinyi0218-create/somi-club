@@ -72,6 +72,23 @@ function imagePage(item,side,page){
   shell.append(blankPage());
   return shell;
  }
+ if(item.src==='assets/page-09-white.png'){
+  shell.classList.add('clock-illustration');
+  shell.innerHTML=`<svg class="story-clock" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1254 1254" role="img" aria-label="시간이 흐르는 그림 시계">
+   <image href="${item.src}" width="1254" height="1254"/>
+   <g fill="white">
+    <rect x="608" y="318" width="41" height="231" rx="3"/>
+    <rect x="576" y="545" width="112" height="145" rx="8"/>
+    <path d="M 536 767 L 600 664 L 632 677 L 568 784 Z"/>
+   </g>
+   <g transform="translate(2.4648 -78.8817) scale(0.611267606)">
+    <g class="clock-hour" data-clock-hand="hour" transform="rotate(0 1030 1135)"><image href="assets/clock-hour-20261030.webp" width="2048" height="2048"/></g>
+    <g class="clock-minute" data-clock-hand="minute" transform="rotate(0 1030 1135)"><image href="assets/clock-minute-20261030.webp" width="2048" height="2048"/></g>
+    <image href="assets/clock-center-20261030.webp" width="2048" height="2048"/>
+   </g>
+  </svg>`;
+  return shell;
+ }
  if(item.src==='assets/page-03.webp'){
   const reveal=document.createElement('div');
   reveal.className='question-reveal question-warm-reveal';
@@ -236,6 +253,14 @@ function syncCoverMotion(){
   }).finally(()=>{video.coverPlayPending=false;});
  }
  return video;
+}
+function updateClockHands(milliseconds){
+ const clock=picture.querySelector('.story-clock');
+ if(!clock)return;
+ const time=reducedMotion.matches?0:milliseconds;
+ // Same centre, with the hour hand advancing twelve times more slowly.
+ clock.querySelector('[data-clock-hand="minute"]').setAttribute('transform',`rotate(${time*.03} 1030 1135)`);
+ clock.querySelector('[data-clock-hand="hour"]').setAttribute('transform',`rotate(${time*.0025} 1030 1135)`);
 }
 function updateQuestionWarm(milliseconds){
  const scene=picture.querySelector('.question-warm-reveal');
@@ -580,6 +605,7 @@ function tick(now){
   if(elapsed>=pages[index].duration*1000||coverVideo?.ended)show(index+1);
  }
  last=now;
+ updateClockHands(elapsed);
  updateQuestionWarm(elapsed);
  if(pages[index].emojiIntro)window.updateSomiEmojiIntro(elapsed,{playing:!paused&&!loading&&!turning&&!document.hidden,rate});
  bar.style.transform=`scaleX(${Math.min(1,elapsed/(pages[index].duration*1000))})`;
